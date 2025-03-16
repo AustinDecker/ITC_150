@@ -1,3 +1,5 @@
+import json
+
 class Contact:
     def __init__(self, name, phone_num, email):
         self.name = name;
@@ -6,6 +8,17 @@ class Contact:
 
     def __str__(self):
         return f"Name: {self.name} Email: {self.email} phone number: {self.phone_num}";
+
+    def save_to_json(self, filepath):
+        contact_dict = {
+            "name": self.name,
+            "phone_num": self.phone_num,
+            "email": self.email
+        }
+        with open(filepath, "a") as file:
+            json.dump(contact_dict, file, indent=4);
+            file.write(",\n")
+
 
 
 def create_menue(options):
@@ -104,10 +117,15 @@ def main():
         del contact_map[email];
         print(f"The contact {deleted_contact} has been removed from the contacts list.")
 
+    def save_contacts():
+        for contact_key in contact_map:
+            contact_map[contact_key].save_to_json("contacts_list.json");
+        print("Contacts have been saved.");
+
     running = True;
     while running:
         print("\n===Contact Registery===");
-        user_option = create_menue(["look-up contact", "view all contacts", "add new contact", "remove existing contact", "exit program"]);
+        user_option = create_menue(["look-up contact", "view all contacts", "add new contact", "remove existing contact", "save contacts", "exit program"]);
 
         match user_option:
             case 0:
@@ -118,7 +136,9 @@ def main():
                 add_contact();
             case 3:
                 remove_contact();
-            case 4: 
+            case 4:
+                save_contacts();
+            case 5: 
                 running = False;
             case _:
                 print("Not a valid option.")
