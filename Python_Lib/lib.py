@@ -95,8 +95,16 @@ def get_user_input(prompt, valid_type="string"):
         case _:
             print("feature not implemented");
 def create_query(query_object, response_list):
-    for response_type, prompt in query_object["questions_list"]:
+    for query in query_object["questions_list"]:
+
+        response_type = query["response_type"]
+        prompt = query["prompt"]
+        validator = query.get("validator") 
         user_response = get_user_input(prompt + ": ", valid_type=response_type)
+
+        if validator is not None:
+            while not validator(user_response):
+                user_response = get_user_input(prompt + ": ", valid_type=response_type)
         response_list.append(user_response)
 def test():
     def test_1():
@@ -128,12 +136,46 @@ def test():
         print("Test 6")
         matrix = []
         print(transpose_matrix(matrix))
-
+    def test_7():
+        def age_validator(age):
+            if age > 0 and age <= 120:
+                return True
+            print(f'{age} cannot be greater than 120 or less than 0')
+            return False
+        def color_validator(color):
+            valid_colors = ["red", "green", "blue"]
+            
+            if color.lower() not in valid_colors:
+                print("Not a valid color.")
+                return False;
+            return True;
+        query_obj = {
+            "questions_list": [
+                {
+                    "prompt": "What is your age?",
+                    "response_type": "int",
+                    "validator": age_validator
+                },
+                {
+                    "prompt": "what is your email?",
+                    "response_type": "string"
+                },
+                {
+                    "prompt": "what is your favorite color?",
+                    "response_type": "string",
+                    "validator": color_validator
+                },
+            ],
+        }
+        response_list = []
+        create_query(query_obj, response_list)
+        print(response_list)
     test_1()
     test_2()
     test_3()
     test_4()
     test_5()
     test_6()
+    test_7()
 
 test()
