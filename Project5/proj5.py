@@ -23,7 +23,7 @@ class BookManager:
             cls.book_map.pop(book_title, None)
             return True
         else:
-            return False;
+            return False
 
     @classmethod
     def add_book(cls, book):
@@ -31,7 +31,7 @@ class BookManager:
             cls.book_map[book.get_title()] = book
             return True
         else:
-            return False;
+            return False
     
     @classmethod
     def set_book_price(cls, book_title, new_price):
@@ -61,7 +61,7 @@ class BookManager:
     def print_book_database(cls):
         print("\n===Book Inventory===")
         for key in cls.book_map.keys():
-            print(cls.book_map[key]);
+            print(cls.book_map[key])
 
 
 
@@ -74,7 +74,7 @@ class Book:
         self._quantity = quantity
 
     def __str__(self):
-        return f"Title: {self._title}\tAuthor: {self._author}\tPrice: ${self._price}\tQty: {self._quantity}";
+        return f"Title: {self._title}\tAuthor: {self._author}\tPrice: ${self._price}\tQty: {self._quantity}"
 
     def set_title(self, title):
         self._title = title
@@ -103,7 +103,7 @@ class Book:
 def get_user_input(prompt, valid_type="string"):
     match valid_type:
         case "string":
-            response = str(input(prompt));
+            response = str(input(prompt))
             return response;
 
         case "int":
@@ -113,7 +113,7 @@ def get_user_input(prompt, valid_type="string"):
                     response = int(input(prompt))
                     return response;
                 except ValueError:
-                    print("invalid input, please retype your response.");
+                    print("invalid input, please retype your response.")
         case "float":
 
             while True:
@@ -121,7 +121,7 @@ def get_user_input(prompt, valid_type="string"):
                     response = float(input(prompt));
                     return response;
                 except ValueError:
-                    print("invalid input, please retype your response.");
+                    print("invalid input, please retype your response.")
         case "boolean":
             while True:
                 response = str(input(prompt))
@@ -132,7 +132,7 @@ def get_user_input(prompt, valid_type="string"):
                 else:
                     print("Invalid input, please retype your response.")
         case _:
-            print("feature not implemented");
+            print("feature not implemented")
 
 def create_query(query_object, response_list):
     for query in query_object["questions_list"]:
@@ -148,11 +148,11 @@ def create_query(query_object, response_list):
         response_list.append(user_response)
 
 def create_menue(options):
-    print(f"\nOptions:");
+    print(f"\nOptions:")
     for index, option in enumerate(options):
-        print(f"\t{index + 1}: {option}");
+        print(f"\t{index + 1}: {option}")
 
-    usr_input = get_user_input("choice: ", valid_type="int");
+    usr_input = get_user_input("choice: ", valid_type="int")
     
     return usr_input - 1 #converting the option back to 0 based indexing
 
@@ -175,21 +175,21 @@ def add_book_to_inventory():
             print("Price cannot be less than or equal to 0")
             return False;
 
-    def qty_validator(price):
-        if price > 0:
+    def qty_validator(qty):
+        if qty > 0:
             return True;
         else:
             print("qty cannot be less than 0")
             return False;
 
-    display_book_inventory();
+    display_book_inventory()
     print("\n===Add Book===")
     query_object = {"questions_list": [{"prompt": "Book Title", "response_type": "string", "validator": book_validator},
                                    {"prompt": "Book Author", "response_type": "string"},
                                    {"prompt": "Book Price", "response_type": "float", "validator": price_validator},
                                    {"prompt": "Book Quantity", "response_type": "int", "validator": qty_validator}]}
     response_list = []
-    create_query(query_object, response_list);
+    create_query(query_object, response_list)
     
     newBook = Book(response_list[0], response_list[1], response_list[2], response_list[3])
     result = BookManager.add_book(newBook)
@@ -202,7 +202,7 @@ def add_book_to_inventory():
 def del_book_from_inventory():
     display_book_inventory()
     print("\n===Delete Book===")
-    book_title = get_user_input("Book Title: ", valid_type="string");
+    book_title = get_user_input("Book Title: ", valid_type="string")
     removed_book = BookManager.get_book(book_title)
     result = BookManager.remove_book(book_title)
 
@@ -255,7 +255,7 @@ def change_book_price():
 def main():
     running = True;
     while running:
-        print("\n===Bookstore Inventory Management System===");
+        print("\n===Bookstore Inventory Management System===")
         user_option = create_menue(["Display Current Inventory", 
                                     "Add Book To Inventory", 
                                     "Delete Book From Inventory", 
