@@ -3,11 +3,23 @@ class BookManager:
     
     @classmethod
     def load_book_database(cls, filepath):
-        pass
+        with open(filepath, mode="r") as fs:
+            line = fs.readline()
+            while line != "":
+                parsed_values = line.split(sep="-")
+                book_title = parsed_values[0].strip()
+                book_author = parsed_values[1].strip()
+                book_price = float(parsed_values[2].strip())
+                book_quantity = int(parsed_values[3].strip())
+                cls.add_book(Book(book_title, book_author, book_price, book_quantity))
+                line = fs.readline()
 
     @classmethod
     def save_book_database(cls, filepath):
-        pass
+        with open(filepath, mode="w") as fs:
+            for k, v in cls.book_map.items():
+                fs.write(f"{v.get_title()}-{v.get_author()}-{v.get_price()}-{v.get_quantity()}\n")
+            
 
     @classmethod
     def is_in_database(cls, book_title):
@@ -252,6 +264,14 @@ def change_book_price():
     if result:
         print(f"updated book:\n{book}")
 
+def load_inventory():
+    BookManager.load_book_database("./book_database.txt")
+    print("database loaded")
+
+def save_inventory():
+    BookManager.save_book_database("./book_database.txt")
+    print("database saved.")
+
 def main():
     running = True
     while running:
@@ -260,7 +280,9 @@ def main():
                                     "Add Book To Inventory", 
                                     "Delete Book From Inventory", 
                                     "Change Quantity of Book", 
-                                    "Change Price of Book", 
+                                    "Change Price of Book",
+                                    "Load Inventory",
+                                    "Save Inventory", 
                                     "Exit Program"])
 
         match user_option:
@@ -274,7 +296,11 @@ def main():
                 change_book_quantity()
             case 4:
                 change_book_price()
-            case 5: 
+            case 5:
+                load_inventory()
+            case 6:
+                save_inventory()
+            case 7: 
                 running = False
             case _:
                 print("Not a valid option.")
