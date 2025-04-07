@@ -217,7 +217,7 @@ def change_book_quantity():
             return True
         else:
             print("Book Title was not found in the database, try again.")
-            return False;
+            return False
 
     display_book_inventory()
     print("\n===Modify Book: Quantity===")
@@ -238,7 +238,7 @@ def change_book_price():
             return True
         else:
             print("Book Title was not found in the database, try again.")
-            return False;
+            return False
     display_book_inventory()
     print("\n===Modify Book: Price===")
     query_obj = {"questions_list":[{"prompt": "Book Title", "response_type": "string", "validator": book_validator},
@@ -253,7 +253,7 @@ def change_book_price():
         print(f"updated book:\n{book}")
 
 def main():
-    running = True;
+    running = True
     while running:
         print("\n===Bookstore Inventory Management System===")
         user_option = create_menue(["Display Current Inventory", 
@@ -261,7 +261,7 @@ def main():
                                     "Delete Book From Inventory", 
                                     "Change Quantity of Book", 
                                     "Change Price of Book", 
-                                    "Exit Program"]);
+                                    "Exit Program"])
 
         match user_option:
             case 0:
