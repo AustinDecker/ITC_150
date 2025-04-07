@@ -1,3 +1,71 @@
+class BookManager:
+    book_map = {}
+    
+    @classmethod
+    def load_book_database(cls, filepath):
+        pass
+
+    @classmethod
+    def save_book_database(cls, filepath):
+        pass
+
+    @classmethod
+    def is_in_database(cls, book_title):
+        return book_title in cls.book_map 
+
+    @classmethod
+    def get_book(cls, book_title):
+        return cls.book_map.get(book_title)
+
+    @classmethod
+    def remove_book(cls, book_title):
+        if cls.is_in_database(book_title):
+            cls.book_map.pop(book_title, None)
+            return True
+        else:
+            return False;
+
+    @classmethod
+    def add_book(cls, book):
+        if not cls.is_in_database(book.get_title()):
+            cls.book_map[book.get_title()] = book
+            return True
+        else:
+            return False;
+    
+    @classmethod
+    def set_book_price(cls, book_title, new_price):
+        if new_price <= 0:
+            return False
+
+        if not cls.is_in_database(book_title):
+            return False
+
+        book = cls.get_book(book_title)
+        book.set_price(new_price)
+        return True
+
+    @classmethod
+    def set_book_qty(cls, book_title, new_qty):
+        if new_qty < 0:
+            return False
+
+        if not cls.is_in_database(book_title):
+            return False
+
+        book = cls.get_book(book_title)
+        book.set_quantity(new_qty)
+        return True
+
+    @classmethod
+    def print_book_database(cls):
+        print("\n===Book Inventory===")
+        for key in cls.book_map.keys():
+            print(cls.book_map[key]);
+
+
+
+
 class Book:
     def __init__(self, title, author, price, quantity):
         self._title = title
@@ -88,47 +156,25 @@ def create_menue(options):
     
     return usr_input - 1 #converting the option back to 0 based indexing
 
-def in_book_database(book_title):
-    book = book_mapping.get(book_title)
-    if book is None:
-        return False
-    else:
-        return True
-    
-def get_book_from_database(book_title):
-    book = book_mapping.get(book_title)
-
-    if book is None:
-        print(f"Book with title {book_title} was not found")
-    else:
-        return book
-    
-def del_book_from_database(book_title):
-    book = book_mapping.pop(book_title, None)
-    if book is not None:
-        return book
-    else:
-        print(f"Book with title {book_title} was not found")
-
 def display_book_inventory():
-    print("\n===Book Inventory===")
-    for key in book_mapping.keys():
-        print(book_mapping[key]);
+    BookManager.print_book_database()
 
 def add_book_to_inventory():
 
     def book_validator(book_title):
-        if not in_book_database(book_title):
-            return True
-        else:
+        result = BookManager.is_in_database(book_title)
+        if result:
             print("Book Title already exists inside the database, try again.")
-            return False;
+            return False
+        return True
+            
     def price_validator(price):
         if price > 0:
             return True;
         else:
             print("Price cannot be less than or equal to 0")
             return False;
+
     def qty_validator(price):
         if price > 0:
             return True;
@@ -144,28 +190,30 @@ def add_book_to_inventory():
                                    {"prompt": "Book Quantity", "response_type": "int", "validator": qty_validator}]}
     response_list = []
     create_query(query_object, response_list);
+    
+    newBook = Book(response_list[0], response_list[1], response_list[2], response_list[3])
+    result = BookManager.add_book(newBook)
 
-    #check if book already exists in database or not
-    if in_book_database(response_list[0]):
-        print("The book already exists in the database.")
-    else:
-        newBook = Book(response_list[0], response_list[1], response_list[2], response_list[3])
-        book_mapping[response_list[0]] = newBook
-
+    if result:
         print(f"{newBook}\nhas been added to the database.")
-
+    else:
+        print("Book already exists.")
+        
 def del_book_from_inventory():
     display_book_inventory()
     print("\n===Delete Book===")
     book_title = get_user_input("Book Title: ", valid_type="string");
-    removed_book = del_book_from_database(book_title);
+    removed_book = BookManager.get_book(book_title)
+    result = BookManager.remove_book(book_title)
 
-    if removed_book is not None:
+    if result:
         print(f"Successfully removed Book from the database.\n{removed_book}")
+    else:
+        print(f"Could not remove book from database. Title {book_title} does not match any book titles.")
 
 def change_book_quantity():
     def book_validator(book_title):
-        if in_book_database(book_title):
+        if BookManager.is_in_database(book_title):
             return True
         else:
             print("Book Title was not found in the database, try again.")
@@ -178,14 +226,15 @@ def change_book_quantity():
     response = []
 
     create_query(query_obj, response)
-    book = get_book_from_database(response[0])
-    book.set_quantity(response[1])
+    result = BookManager.set_book_qty(response[0], response[1])
+    book = BookManager.get_book(response[0])
 
-    print(f"updated book:\n{book}")
+    if result:
+        print(f"updated book:\n{book}")
 
 def change_book_price():
     def book_validator(book_title):
-        if in_book_database(book_title):
+        if BookManager.is_in_database(book_title):
             return True
         else:
             print("Book Title was not found in the database, try again.")
@@ -193,17 +242,16 @@ def change_book_price():
     display_book_inventory()
     print("\n===Modify Book: Price===")
     query_obj = {"questions_list":[{"prompt": "Book Title", "response_type": "string", "validator": book_validator},
-                               {"prompt": "New Price", "response_type": "int", "validator": lambda x: x > 0}]}
+                               {"prompt": "New Price", "response_type": "float", "validator": lambda x: x > 0}]}
     response = []
 
     create_query(query_obj, response)
-    book = get_book_from_database(response[0])
-    book.set_price(response[1])
+    result = BookManager.set_book_price(response[0], response[1])
+    book = BookManager.get_book(response[0])
 
-    print(f"updated book:\n{book}")
+    if result:
+        print(f"updated book:\n{book}")
 
-# globals
-book_mapping = {};
 def main():
     running = True;
     while running:
